@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="sim" default="true"/>
+
+  <!-- startup ros_control for real robot -->
+  <group unless="$(arg sim)">
+    <include file="$(find open_manipulator_hw)/launch/open_manipulator_control.launch"/>
+  </group>
+
+  <!-- startup simulated world and spawn robot-->
+  <group if="$(arg sim)">
+    <include file="$(find open_manipulator_hw)/launch/open_manipulator_gazebo.launch"/>
+  </group>
+
+  <!-- controller utils -->
+  <include file="$(find open_manipulator_hw)/launch/controller_utils.launch"/>
+
+  <!-- joint_trajectory_controller -->
+  <rosparam file="$(find open_manipulator_controllers)/config/joint_trajectory_controller.yaml" command="load"/>
+  <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" respawn="false" output="screen" args="spawn arm_controller"/>
+  <node name="gripper_controller_spawner" pkg="controller_manager" type="controller_manager" respawn="false" output="screen" args="spawn gripper_controller"/>
+
+  <include file="$(find open_manipulator_moveit_config)/launch/move_group.launch"/>
+  <include file="$(find open_manipulator_moveit_config)/launch/moveit_rviz.launch"/>
+</launch>

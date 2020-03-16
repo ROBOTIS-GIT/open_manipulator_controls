@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="usb_port" default="/dev/ttyUSB0" />
+  <arg name="baud_rate" default="1000000" />
+  <arg name="yaml_file" default="$(find open_manipulator_hw)/config/hardware.yaml"/>
+
+  <node pkg="open_manipulator_hw" type="control_node" name="control_node" output="screen">
+    <param name="usb_port" value="$(arg usb_port)"/>
+    <param name="baud_rate" value="$(arg baud_rate)"/>
+    <param name="yaml_file" value="$(arg yaml_file)"/>
+  </node>
+
+  <!-- send robot urdf to param server -->
+  <param name="robot_description"
+    command="$(find xacro)/xacro --inorder '$(find open_manipulator_description)/urdf/open_manipulator_robot.urdf.xacro'"/>
+</launch>
