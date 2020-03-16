@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2018 ROBOTIS CO., LTD.
+* Copyright 2020 ROBOTIS CO., LTD.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 /* Authors: Ryan Shim */
 
-#ifndef OPEN_MANIPULATOR_HARWARE_INTERFACE_H
-#define OPEN_MANIPULATOR_HARWARE_INTERFACE_H
+#ifndef OPEN_MANIPULATOR_HARDWARE_INTERFACE_H
+#define OPEN_MANIPULATOR_HARDWARE_INTERFACE_H
 
 #include <yaml-cpp/yaml.h>
 
@@ -99,4 +99,4 @@ class HardwareInterface : public hardware_interface::RobotHW
 };
 
 } // namespace open_manipulator_hw
-#endif // OPEN_MANIPULATOR_HARWARE_INTERFACE_H
+#endif // OPEN_MANIPULATOR_HARDWARE_INTERFACE_H
