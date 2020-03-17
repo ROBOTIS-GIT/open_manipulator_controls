@@ -2,8 +2,12 @@
 
 ## How to Run
 ```bash
-# MoveGroup + JointTrajectoryController
+(MoveGroup + JointTrajectoryController)
+# Gazebo Simulation
 $ roslaunch open_manipulator_controllers joint_trajectory_controller.launch
+
+# Real Robot
+$ roslaunch open_manipulator_controllers joint_trajectory_controller.launch sim:=false
 ```
 
 ## ToDo
