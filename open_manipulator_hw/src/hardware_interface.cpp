@@ -296,7 +296,13 @@ bool HardwareInterface::initSDKHandlers(void)
 void HardwareInterface::registerControlInterfaces()
 {
   // resize vector
-  joints_.resize(dynamixel_.size());
+  uint8_t joint_size = 0;
+  for (auto const& dxl:dynamixel_)
+  {
+    if (joint_size < (uint8_t)dxl.second)
+      joint_size = (uint8_t)dxl.second;
+  }
+  joints_.resize(joint_size);
 
   for (auto iter = dynamixel_.begin(); iter != dynamixel_.end(); iter++)
   {

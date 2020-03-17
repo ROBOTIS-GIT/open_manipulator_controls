@@ -1,10 +1,10 @@
 joint1:
-  ID: 1
+  ID: 11
 joint2:
-  ID: 2
+  ID: 12
 joint3:
-  ID: 3
+  ID: 13
 joint4:
-  ID: 4
+  ID: 14
 gripper:
-  ID: 5
+  ID: 15
