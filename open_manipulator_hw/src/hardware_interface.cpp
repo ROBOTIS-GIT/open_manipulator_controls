@@ -337,102 +337,78 @@ void HardwareInterface::read()
   int32_t get_current[dynamixel_.size()];
 
   uint8_t id_array[dynamixel_.size()];
+  std::string name_array[dynamixel_.size()];
   uint8_t id_cnt = 0;
 
   uint8_t sync_read_handler = 0; // 0 for present position, velocity, current
   for (auto const& dxl:dynamixel_)
+  {
+    name_array[id_cnt] = dxl.first.c_str();
     id_array[id_cnt++] = (uint8_t)dxl.second;
-
-  if (dxl_wb_->getProtocolVersion() == 2.0f)
-  {
-    result = dxl_wb_->syncRead(sync_read_handler,
-                               id_array,
-                               dynamixel_.size(),
-                               &log);
-    if (result == false)
-    {
-      ROS_ERROR("%s", log);
-    }
-
-    result = dxl_wb_->getSyncReadData(sync_read_handler,
-                                      id_array,
-                                      id_cnt,
-                                      control_items_["Present_Current"]->address,
-                                      control_items_["Present_Current"]->data_length,
-                                      get_current,
-                                      &log);
-    if (result == false)
-    {
-      ROS_ERROR("%s", log);
-    }
-
-    result = dxl_wb_->getSyncReadData(sync_read_handler,
-                                      id_array,
-                                      id_cnt,
-                                      control_items_["Present_Velocity"]->address,
-                                      control_items_["Present_Velocity"]->data_length,
-                                      get_velocity,
-                                      &log);
-    if (result == false)
-    {
-      ROS_ERROR("%s", log);
-    }
-
-    result = dxl_wb_->getSyncReadData(sync_read_handler,
-                                      id_array,
-                                      id_cnt,
-                                      control_items_["Present_Position"]->address,
-                                      control_items_["Present_Position"]->data_length,
-                                      get_position,
-                                      &log);
-    if (result == false)
-    {
-      ROS_ERROR("%s", log);
-    }
-
-    for(uint8_t index = 0; index < id_cnt; index++)
-    {
-      // Position
-      joints_[id_array[index]-1].position = dxl_wb_->convertValue2Radian((uint8_t)id_array[index], (int32_t)get_position[index]);
-
-      // Velocity
-      joints_[id_array[index]-1].velocity = dxl_wb_->convertValue2Velocity((uint8_t)id_array[index], (int32_t)get_velocity[index]);
-
-      // Effort
-      if (strcmp(dxl_wb_->getModelName((uint8_t)id_array[index]), "XL-320") == 0)
-        joints_[id_array[index]-1].effort = dxl_wb_->convertValue2Load((int16_t)get_current[index]);
-      else
-        joints_[id_array[index]-1].effort = dxl_wb_->convertValue2Current((int16_t)get_current[index]);
-
-      joints_[id_array[index]-1].position_command = joints_[id_array[index]-1].position;
-    }
   }
-  else if(dxl_wb_->getProtocolVersion() == 1.0f)
+
+  result = dxl_wb_->syncRead(sync_read_handler,
+                              id_array,
+                              dynamixel_.size(),
+                              &log);
+  if (result == false)
   {
-    uint16_t length_of_data = control_items_["Present_Position"]->data_length +
-      control_items_["Present_Velocity"]->data_length +
-      control_items_["Present_Current"]->data_length;
-    uint32_t get_all_data[length_of_data];
-    uint8_t dxl_cnt = 0;
-    for (auto const& dxl:dynamixel_)
-    {
-      result = dxl_wb_->readRegister((uint8_t)dxl.second,
-                                      control_items_["Present_Position"]->address,
-                                      length_of_data,
-                                      get_all_data,
-                                      &log);
-      if (result == false)
-      {
-        ROS_ERROR("%s", log);
-      }
+    ROS_ERROR("%s", log);
+  }
 
-      // ID required to get model name
-      joints_[(uint8_t)dxl.second-1].position = dxl_wb_->convertValue2Radian((uint8_t)dxl.second, (int32_t)DXL_MAKEWORD(get_all_data[0], get_all_data[1]));
-      joints_[(uint8_t)dxl.second-1].velocity = dxl_wb_->convertValue2Velocity((uint8_t)dxl.second, (int32_t)DXL_MAKEWORD(get_all_data[2], get_all_data[3]));
-      joints_[(uint8_t)dxl.second-1].effort = dxl_wb_->convertValue2Current(DXL_MAKEWORD(get_all_data[4], get_all_data[5])) * (1.8e-03);
+  result = dxl_wb_->getSyncReadData(sync_read_handler,
+                                    id_array,
+                                    id_cnt,
+                                    control_items_["Present_Current"]->address,
+                                    control_items_["Present_Current"]->data_length,
+                                    get_current,
+                                    &log);
+  if (result == false)
+  {
+    ROS_ERROR("%s", log);
+  }
 
-      dxl_cnt++;
-    }
+  result = dxl_wb_->getSyncReadData(sync_read_handler,
+                                    id_array,
+                                    id_cnt,
+                                    control_items_["Present_Velocity"]->address,
+                                    control_items_["Present_Velocity"]->data_length,
+                                    get_velocity,
+                                    &log);
+  if (result == false)
+  {
+    ROS_ERROR("%s", log);
+  }
+
+  result = dxl_wb_->getSyncReadData(sync_read_handler,
+                                    id_array,
+                                    id_cnt,
+                                    control_items_["Present_Position"]->address,
+                                    control_items_["Present_Position"]->data_length,
+                                    get_position,
+                                    &log);
+  if (result == false)
+  {
+    ROS_ERROR("%s", log);
+  }
+
+  for(uint8_t index = 0; index < id_cnt; index++)
+  {
+    // Position
+    joints_[id_array[index]-1].position = dxl_wb_->convertValue2Radian((uint8_t)id_array[index], (int32_t)get_position[index]);
+    if (strcmp(name_array[index].c_str(), "gripper") == 0)
+      joints_[id_array[index]-1].position /= 150.0;
+
+    // Velocity
+    joints_[id_array[index]-1].velocity = dxl_wb_->convertValue2Velocity((uint8_t)id_array[index], (int32_t)get_velocity[index]);
+
+    // Effort
+    if (strcmp(dxl_wb_->getModelName((uint8_t)id_array[index]), "XL-320") == 0)
+      joints_[id_array[index]-1].effort = dxl_wb_->convertValue2Load((int16_t)get_current[index]);
+    else
+      joints_[id_array[index]-1].effort = dxl_wb_->convertValue2Current((int16_t)get_current[index]);
+
+    joints_[id_array[index]-1].position_command = joints_[id_array[index]-1].position;
   }
 }
 
@@ -449,11 +425,14 @@ void HardwareInterface::write()
   int32_t dynamixel_effort[dynamixel_.size()];
 
   for (auto const& dxl:dynamixel_)
-    id_array[id_cnt++] = (uint8_t)dxl.second;
-
-  for (uint8_t index = 0; index < id_cnt; index++)
-    dynamixel_position[index] = dxl_wb_->convertRadian2Value(id_array[index], joints_[id_array[index]-1].position_command);
-    // dynamixel_effort[index] = dxl_wb_->convertCurrent2Value(id_array[index], joints_[id_array[index]-1].effort_command) / (1.8e-03);
+  {
+    id_array[id_cnt] = (uint8_t)dxl.second;
+    dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command);
+    // dynamixel_effort[id_cnt] = dxl_wb_->convertCurrent2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].effort_command) / (1.8e-03);
+    if (strcmp(dxl.first.c_str(), "gripper") == 0)
+      dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command * 150.0);
+    id_cnt ++;
+  }
 
   uint8_t sync_write_handler = 0; // 0: position, 1: velocity, 2: effort
   result = dxl_wb_->syncWrite(sync_write_handler, id_array, id_cnt, dynamixel_position, 1, &log);
