@@ -412,7 +412,7 @@ void HardwareInterface::read()
     if (strcmp(dxl_wb_->getModelName((uint8_t)id_array[index]), "XL-320") == 0)
       joints_[id_array[index]-1].effort = dxl_wb_->convertValue2Load((int16_t)get_current[index]);
     else
-      joints_[id_array[index]-1].effort = dxl_wb_->convertValue2Current((int16_t)get_current[index]);
+      joints_[id_array[index]-1].effort = dxl_wb_->convertValue2Current((int16_t)get_current[index]) * (1.78e-03);
 
     joints_[id_array[index]-1].position_command = joints_[id_array[index]-1].position;
   }
@@ -434,7 +434,8 @@ void HardwareInterface::write()
   {
     id_array[id_cnt] = (uint8_t)dxl.second;
     dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command);
-    // dynamixel_effort[id_cnt] = dxl_wb_->convertCurrent2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].effort_command) / (1.8e-03);
+    // dynamixel_effort[id_cnt] = dxl_wb_->convertCurrent2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].effort_command / (1.78e-03));
+
     if (strcmp(dxl.first.c_str(), "gripper") == 0)
       dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command * 150.0);
     id_cnt ++;
@@ -442,6 +443,7 @@ void HardwareInterface::write()
 
   uint8_t sync_write_handler = 0; // 0: position, 1: velocity, 2: effort
   result = dxl_wb_->syncWrite(sync_write_handler, id_array, id_cnt, dynamixel_position, 1, &log);
+  // result = dxl_wb_->syncWrite(sync_write_handler, id_array, id_cnt, dynamixel_effort, 1, &log);
   if (result == false)
   {
     ROS_ERROR("%s", log);
