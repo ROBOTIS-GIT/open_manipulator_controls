@@ -8,6 +8,14 @@ $ roslaunch open_manipulator_controllers joint_trajectory_controller.launch
 
 # Real Robot
 $ roslaunch open_manipulator_controllers joint_trajectory_controller.launch sim:=false
+
+(GravityCompensationController)
+# Gazebo Simulation
+# Set trasmission to effort first
+$ roslaunch open_manipulator_controllers joint_trajectory_controller.launch 
+
+# Real Robot
+$ roslaunch open_manipulator_controllers gravity_compensation_controller.launch sim:=false
 ```
 
 ## ToDo

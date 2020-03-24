@@ -83,6 +83,7 @@ class HardwareInterface : public hardware_interface::RobotHW
   std::string port_name_;
   int32_t baud_rate_;
   std::string yaml_file_;
+  std::string interface_;
 
   // Variables
   DynamixelWorkbench *dxl_wb_;

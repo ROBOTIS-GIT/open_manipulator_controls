@@ -30,6 +30,7 @@ HardwareInterface::HardwareInterface(ros::NodeHandle nh, ros::NodeHandle private
   port_name_ = priv_node_handle_.param<std::string>("usb_port", "/dev/ttyUSB0");
   baud_rate_ = priv_node_handle_.param<int32_t>("baud_rate", 1000000);
   yaml_file_ = priv_node_handle_.param<std::string>("yaml_file", "");
+  interface_ = priv_node_handle_.param<std::string>("interface", "position");
 
   /************************************************************
   ** Register Interfaces
@@ -430,20 +431,35 @@ void HardwareInterface::write()
   int32_t dynamixel_velocity[dynamixel_.size()];
   int32_t dynamixel_effort[dynamixel_.size()];
 
-  for (auto const& dxl:dynamixel_)
+  if (strcmp(interface_.c_str(), "position") == 0)
   {
-    id_array[id_cnt] = (uint8_t)dxl.second;
-    dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command);
-    // dynamixel_effort[id_cnt] = dxl_wb_->convertCurrent2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].effort_command / (1.78e-03));
+    for (auto const& dxl:dynamixel_)
+    {
+      id_array[id_cnt] = (uint8_t)dxl.second;
+      dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command);
 
-    if (strcmp(dxl.first.c_str(), "gripper") == 0)
-      dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command * 150.0);
-    id_cnt ++;
+      if (strcmp(dxl.first.c_str(), "gripper") == 0)
+        dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command * 150.0);
+      id_cnt ++;
+    }
+    uint8_t sync_write_handler = 0; // 0: position, 1: velocity, 2: effort
+    result = dxl_wb_->syncWrite(sync_write_handler, id_array, id_cnt, dynamixel_position, 1, &log);
+  }
+  else if (strcmp(interface_.c_str(), "effort") == 0)
+  {
+    for (auto const& dxl:dynamixel_)
+    {
+      id_array[id_cnt] = (uint8_t)dxl.second;
+      dynamixel_effort[id_cnt] = dxl_wb_->convertCurrent2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].effort_command / (1.78e-03));
+
+      if (strcmp(dxl.first.c_str(), "gripper") == 0)
+        dynamixel_position[id_cnt] = dxl_wb_->convertRadian2Value((uint8_t)dxl.second, joints_[(uint8_t)dxl.second-1].position_command * 150.0);
+      id_cnt ++;
+    }
+    uint8_t sync_write_handler = 2; // 0: position, 1: velocity, 2: effort
+    result = dxl_wb_->syncWrite(sync_write_handler, id_array, id_cnt, dynamixel_effort, 1, &log);
   }
 
-  uint8_t sync_write_handler = 0; // 0: position, 1: velocity, 2: effort
-  result = dxl_wb_->syncWrite(sync_write_handler, id_array, id_cnt, dynamixel_position, 1, &log);
-  // result = dxl_wb_->syncWrite(sync_write_handler, id_array, id_cnt, dynamixel_effort, 1, &log);
   if (result == false)
   {
     ROS_ERROR("%s", log);
