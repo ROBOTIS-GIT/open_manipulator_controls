@@ -87,11 +87,7 @@ bool GravityCompensationController::init(
   return true;
 }
 
-void GravityCompensationController::starting(const ros::Time& time) {
-  for (size_t i = 0; i < kdl_chain_.getNrOfJoints(); i++) {
-    q_(i) = effort_joint_handles_[i].getPosition();
-  }
-}
+void GravityCompensationController::starting(const ros::Time& time) {}
 
 void GravityCompensationController::update(const ros::Time& time,
                                            const ros::Duration& period) {
