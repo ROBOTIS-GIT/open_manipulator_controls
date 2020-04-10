@@ -99,7 +99,7 @@ void GravityCompensationController::update(const ros::Time& time,
   // Compute the gravity torque
   MCG_solver_->JntToGravity(q_, G_);
 
-  for (unsigned int i = 0; i < kdl_chain_.getNrOfJoints(); i++) {
+  for (size_t i = 0; i < kdl_chain_.getNrOfJoints(); i++) {
     tau_(i) = 0;
     tau_(i) += G_(i);
   }
