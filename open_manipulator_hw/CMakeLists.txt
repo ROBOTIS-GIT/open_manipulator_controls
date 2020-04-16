@@ -68,14 +68,14 @@ include_directories(
   ${YAML_CPP_INCLUDE_DIRS}
 )
 
-add_executable(control_node src/control_node.cpp src/hardware_interface.cpp)
-add_dependencies(control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(control_node ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+add_executable(omx_control_node src/omx_control_node.cpp src/hardware_interface.cpp)
+add_dependencies(omx_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(omx_control_node ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 ################################################################################
 # Install
 ################################################################################
-install(TARGETS control_node
+install(TARGETS omx_control_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
