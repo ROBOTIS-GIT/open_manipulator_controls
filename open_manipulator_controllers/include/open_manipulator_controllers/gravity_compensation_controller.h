@@ -16,9 +16,13 @@
 
 /* Authors: Ryan Shim */
 
-#pragma once
+#ifndef OPEN_MANIPULATOR_CONTROLLERS_GRAVITY_COMPENSATION_CONTROLLER_H
+#define OPEN_MANIPULATOR_CONTROLLERS_GRAVITY_COMPENSATION_CONTROLLER_H
 
 #include <boost/scoped_ptr.hpp>
+#include <string>
+#include <vector>
+
 #include <controller_interface/controller.h>
 #include <controller_interface/controller_base.h>
 #include <controller_interface/multi_interface_controller.h>
@@ -41,11 +45,12 @@
 #include <ros/time.h>
 #include <urdf/model.h>
 
-namespace open_manipulator_controllers {
-
+namespace open_manipulator_controllers
+{
 class GravityCompensationController
     : public controller_interface::MultiInterfaceController<
-          hardware_interface::EffortJointInterface> {
+          hardware_interface::EffortJointInterface>
+{
  public:
   bool init(hardware_interface::RobotHW* robot_hardware,
             ros::NodeHandle& node_handle) override;
@@ -58,6 +63,8 @@ class GravityCompensationController
   hardware_interface::EffortJointInterface* effort_joint_interface_;
   std::vector<hardware_interface::JointHandle> effort_joint_handles_;
   std::vector<std::string> joint_names_;
+  std::string root_name_;
+  std::string tip_name_;
 
   // KDL
   KDL::Tree kdl_tree_;
@@ -70,5 +77,5 @@ class GravityCompensationController
   // KDL solver
   boost::scoped_ptr<KDL::ChainDynParam> MCG_solver_;
 };
-
 }  // namespace open_manipulator_controllers
+#endif  // OPEN_MANIPULATOR_CONTROLLERS_GRAVITY_COMPENSATION_CONTROLLER_H
