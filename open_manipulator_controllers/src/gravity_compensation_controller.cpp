@@ -78,7 +78,7 @@ bool GravityCompensationController::init(
     ROS_ERROR("[GravityCompensationController] Could not find tip link name");
     return false;
   }
-  if (!kdl_tree_.getChain(root_name, tip_name, kdl_chain_))
+  if (!kdl_tree_.getChain(root_name_, tip_name_, kdl_chain_))
   {
     ROS_ERROR(
         "[GravityCompensationController] Could not get KDL chain from tree");
