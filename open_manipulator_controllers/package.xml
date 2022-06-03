@@ -18,6 +18,8 @@
   <depend>pluginlib</depend>
   <depend>roscpp</depend>
   <depend>urdf</depend>
+  <depend>joint_trajectory_controller</depend>
+  <depend>moveit_simple_controller_manager</depend>
 
   <export>
     <controller_interface plugin="${prefix}/controller_plugin.xml" />
