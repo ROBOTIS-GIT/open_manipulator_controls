@@ -4,6 +4,8 @@
   <arg name="paused" default="true"/>
   <arg name="use_sim_time" default="true"/>
 
+  <rosparam file="$(find open_manipulator_gazebo)/config/gazebo_controller.yaml" command="load"/>
+
   <!-- startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="paused" value="$(arg paused)"/>
